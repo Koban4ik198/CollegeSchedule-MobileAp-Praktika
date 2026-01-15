@@ -42,6 +42,16 @@ android {
 }
 
 dependencies {
+    // Сетевое взаимодействие (Retrofit)
+    implementation("com.squareup.retrofit2:retrofit:2.12.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.12.0")
+
+    // Асинхронность (Корутины)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+
+    // ViewModel для Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
