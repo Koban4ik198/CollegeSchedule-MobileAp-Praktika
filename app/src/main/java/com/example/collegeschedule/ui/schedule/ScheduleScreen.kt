@@ -19,12 +19,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.collegeschedule.data.dto.GroupDto
+import com.example.collegeschedule.data.repository.ScheduleRepository
 import com.example.collegeschedule.data.dto.ScheduleByDateDto
 import com.example.collegeschedule.data.network.RetrofitInstance
 import com.example.collegeschedule.utils.getWeekDateRange
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
-fun ScheduleScreen() {
+fun ScheduleScreen(
+    repository: ScheduleRepository,
+    initialGroupName: String? = null
+) {
 
     var schedule by remember { mutableStateOf<List<ScheduleByDateDto>>(emptyList()) }
     var groups by remember { mutableStateOf<List<GroupDto>>(emptyList()) }
@@ -34,17 +40,28 @@ fun ScheduleScreen() {
     var error by remember { mutableStateOf<String?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
+    var favoriteGroups by remember { mutableStateOf<List<String>>(emptyList()) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         try {
-            groups = RetrofitInstance.api.getAllGroups()
+            groups = repository.loadAllGroups()
             if (groups.isNotEmpty()) {
-                selectedGroup = groups.first() // Выбираем первую группу по умолчанию
+                // Если передана группа из избранного — выбираем её
+                val initialGroup = groups.find { it.groupName == initialGroupName }
+                selectedGroup = initialGroup ?: groups.first()
             }
         } catch (e: Exception) {
             error = "Ошибка загрузки списка групп: ${e.message}"
         } finally {
             loadingGroups = false
+        }
+    }
+
+    // Подписка на изменения избранных групп
+    LaunchedEffect(Unit) {
+        repository.getFavorites().collect { favorites ->
+            favoriteGroups = favorites
         }
     }
 
@@ -56,10 +73,10 @@ fun ScheduleScreen() {
 
         try {
             val (start, end) = getWeekDateRange()
-            schedule = RetrofitInstance.api.getSchedule(
+            schedule = repository.loadSchedule(
                 groupName = selectedGroup!!.groupName,
-                start = start,
-                end = end
+                startDate = start,
+                endDate = end
             )
         } catch (e: Exception) {
             error = "Ошибка загрузки расписания: ${e.message}"
@@ -87,11 +104,21 @@ fun ScheduleScreen() {
             } else if (error != null) {
                 Text("Ошибка: $error")
             } else {
-                GroupDropdown(
+                GroupDropdownWithFavorite(
                     groups = groups,
                     selectedGroup = selectedGroup,
                     onGroupSelected = { group ->
                         selectedGroup = group
+                    },
+                    favoriteGroups = favoriteGroups,
+                    onFavoriteToggle = { groupName ->
+                        scope.launch {
+                            if (groupName in favoriteGroups) {
+                                repository.removeFavorite(groupName)
+                            } else {
+                                repository.addFavorite(groupName)
+                            }
+                        }
                     },
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
