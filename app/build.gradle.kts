@@ -56,6 +56,8 @@ dependencies {
     // Навигация (NavigationSuiteScaffold)
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.3.0")
 
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
