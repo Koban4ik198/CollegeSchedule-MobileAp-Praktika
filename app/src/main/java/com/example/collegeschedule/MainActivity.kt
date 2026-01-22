@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import com.example.collegeschedule.data.api.ScheduleApi
@@ -65,16 +66,32 @@ fun CollegeScheduleApp() {
     var selectedGroupName by rememberSaveable { mutableStateOf<String?>(null) }
 
     NavigationSuiteScaffold(
+        // ✅ СТИЛИ В ХОЛОДНОЙ ЦВЕТОВОЙ ГАММЕ:
+        containerColor = Color.White, // Белый фон панели
         navigationSuiteItems = {
             AppDestinations.entries.forEach {
                 item(
                     icon = {
                         Icon(
                             it.icon,
-                            contentDescription = it.label
+                            contentDescription = it.label,
+                            tint = if (it == currentDestination) {
+                                Color(0xFF00A2FF) // Ярко-голубой для выбранного
+                            } else {
+                                Color(0xFF3385FF) // Синий для невыбранного
+                            }
                         )
                     },
-                    label = { Text(it.label) },
+                    label = {
+                        Text(
+                            it.label,
+                            color = if (it == currentDestination) {
+                                Color(0xFF00A2FF) // Ярко-голубой для выбранного
+                            } else {
+                                Color(0xFF3385FF) // Синий для невыбранного
+                            }
+                        )
+                    },
                     selected = it == currentDestination,
                     onClick = { currentDestination = it }
                 )

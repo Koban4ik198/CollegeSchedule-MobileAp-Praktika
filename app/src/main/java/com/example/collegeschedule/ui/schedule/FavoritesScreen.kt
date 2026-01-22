@@ -10,8 +10,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.collegeschedule.data.repository.ScheduleRepository
 
@@ -47,28 +48,38 @@ fun FavoritesScreen(
         verticalArrangement = Arrangement.Center
     ) {
         if (isLoading) {
-            Text("Загрузка...")
+            Text(
+                "Загрузка...",
+                color = Color(0xFF3385FF) // Синий текст
+            )
         } else if (favoriteGroups.isEmpty()) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Favorite,
                     contentDescription = "Нет избранных",
-                    tint = MaterialTheme.colorScheme.secondary
+                    tint = Color(0xFF3385FF) // Синяя иконка
                 )
-                Text("Нет избранных групп")
-                Text("Добавьте группы через выпадающий список", style = MaterialTheme.typography.bodySmall)
+                Text(
+                    "Нет избранных групп",
+                    color = Color(0xFF3385FF) // Синий текст
+                )
+                Text(
+                    "Добавьте группы через выпадающий список",
+                    color = Color(0xFF3385FF).copy(alpha = 0.7f), // Полупрозрачный синий
+                    modifier = Modifier.padding(horizontal = 32.dp)
+                )
             }
         } else {
             Text(
                 "Избранные группы",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = 16.dp)
+                color = Color(0xFF00A2FF), // Ярко-голубой заголовок
+                modifier = Modifier.padding(bottom = 20.dp)
             )
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(favoriteGroups) { groupName ->
                     Card(
@@ -76,12 +87,21 @@ fun FavoritesScreen(
                             .fillMaxSize()
                             .clickable {
                                 onGroupSelected(groupName)
-                            }
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White, // Белый фон карточки
+                            contentColor = Color(0xFF3385FF) // Синий текст внутри
+                        ),
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation = 4.dp
+                        )
                     ) {
                         Text(
                             text = groupName,
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(16.dp)
+                            color = Color(0xFF3385FF), // Синий текст группы
+                            modifier = Modifier
+                                .padding(20.dp)
+                                .fillMaxSize()
                         )
                     }
                 }
